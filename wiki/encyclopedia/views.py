@@ -2,6 +2,10 @@ from django.shortcuts import redirect, render
 from django import forms
 from . import util
 
+class NewPageForm(forms.Form):
+    title = forms.CharField(label="Title of New Page")
+    
+
 def lowercase_entries():
     entries = util.list_entries()
     for entry in range(len(entries)):
@@ -21,7 +25,7 @@ def greet(request,name):
             "title" : name
         })
     else:
-        return render(request, "encyclopedia/error.html", {
+        return render(request, "encyclopedia/greet.html", {
             "message" : f"page {name} does not exist"
         })
 
@@ -43,3 +47,24 @@ def search(request):
                 "entries": entries,
             })
         return render(request, "encyclopedia/index.html")
+
+def new_page(request):
+    if request.method == "POST":
+        form = NewPageForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data["title"]
+            if title.lower() in lowercase_entries():
+                return render(request,"encyclopedia/index.html", {
+                    "message": "this title already exists"
+                })
+
+            content = request.POST.get("page_content")
+            util.save_entry(title, content)
+            return render(request, "encyclopedia/greet.html", {
+                "entry" : util.get_entry(title),
+                "title" : title,
+            })
+        
+    return render(request, "encyclopedia/new_page.html", {
+        "form": NewPageForm()
+    })
