@@ -2,9 +2,11 @@
 
 {% block title %}
     Create a new page
+    
 {% endblock %}
 
 {% block body %}
+    {% if new_page %}
     <form action="{% url 'wiki:new_page'%}" method="post">
         {% csrf_token %}
         {{form}}
@@ -13,6 +15,19 @@
         </textarea>
         <input type="submit" value="Save Page">
     </form>
+    {% else %}
+    <form action="{% url 'wiki:save_changes'%}" method="post">
+        {% csrf_token %}
+        <div>{{title}}</div>
+        
+        <textarea name="page_content" palceholder="enter your's content of page" rows="3" cols="50">
+            {{content}}
+        </textarea>
+        <input type="hidden" name="title" value="{{title}}">
+        <input type="submit" value="Save changes on Page">
+    </form>
+
+    {% endif %}
     
     
 

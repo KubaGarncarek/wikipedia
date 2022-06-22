@@ -5,6 +5,18 @@
 {% endblock %}
 
 {% block body %}
-    {{entry}}
+    <form action="{% url 'wiki:edit_page' %}" method="post">
+
+        {% csrf_token %}
+        
+        {{entry}}
+        
+        <div class="edit_page">
+            <input type="submit" value="Edit Page">
+        </div>
+        <input type="hidden" name="title" value="{{title}}">
+        <input type="hidden" name="content" value="{{entry}}">
+    </form>
+        
     {{message}}
 {% endblock %}

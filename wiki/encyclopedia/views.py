@@ -3,7 +3,7 @@ from django import forms
 from . import util
 
 class NewPageForm(forms.Form):
-    title = forms.CharField(label="Title of New Page")
+    title = forms.CharField(label="Title of Page")
     
 
 def lowercase_entries():
@@ -17,13 +17,14 @@ def index(request):
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries(),
     })
+
 def greet(request,name):
-    name = name.lower()
-    if name in lowercase_entries():
+    if name.lower() in lowercase_entries():
         return render(request, "encyclopedia/greet.html", {
             "entry" : util.get_entry(name),
             "title" : name
         })
+
     else:
         return render(request, "encyclopedia/greet.html", {
             "message" : f"page {name} does not exist"
@@ -38,14 +39,17 @@ def search(request):
                 "entry" : util.get_entry(searched_entry),
                 "title" : searched_entry
             })
+
         entries = []
         for entry in lowercase_entries():
             if searched_entry in entry:
                 entries.append(entry)
+
         if entries:
             return render(request, "encyclopedia/index.html", {
                 "entries": entries,
             })
+
         return render(request, "encyclopedia/index.html")
 
 def new_page(request):
@@ -60,11 +64,32 @@ def new_page(request):
 
             content = request.POST.get("page_content")
             util.save_entry(title, content)
+
             return render(request, "encyclopedia/greet.html", {
                 "entry" : util.get_entry(title),
-                "title" : title,
+                "title" : title
+                
             })
-        
+
     return render(request, "encyclopedia/new_page.html", {
-        "form": NewPageForm()
+        "form": NewPageForm(),
+        "new_page" : True
+        
+    })
+
+def edit_page(request):
+    title = request.POST['title']
+    content = request.POST['content']
+    print(title)    
+    return render(request, "encyclopedia/new_page.html", {
+            "content" : content,
+            "title" : title      
+        })
+def save_changes(request):
+    title = request.POST['title']
+    content = request.POST.get('page_content')
+    util.save_entry(title, content)
+    return render(request, "encyclopedia/greet.html", {
+        "entry" : util.get_entry(title),
+        
     })
