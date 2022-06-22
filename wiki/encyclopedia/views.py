@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, render
 from django import forms
 from . import util
+import random
 
 class NewPageForm(forms.Form):
     title = forms.CharField(label="Title of Page")
@@ -93,3 +94,7 @@ def save_changes(request):
         "entry" : util.get_entry(title),
         
     })
+
+def random_page(request):
+    random_page = random.choice(util.list_entries())
+    return greet(request,random_page)
